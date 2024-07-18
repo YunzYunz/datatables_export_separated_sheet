@@ -187,7 +187,8 @@ $(document).ready(function() {
         },
 		order: [],
 		columnDefs: [
-			{ targets: [0], orderable: false } // Menonaktifkan pengurutan pada kolom pertama (checkboxes)
+			{ targets: [0], orderable: false }, // Menonaktifkan pengurutan pada kolom pertama (checkboxes)
+			{ targets: [4], visible: false } // Sembunyikan kolom 
 		]
     });
 	
