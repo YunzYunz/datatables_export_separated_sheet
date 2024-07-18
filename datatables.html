@@ -301,6 +301,10 @@ $('#exportExcel').on('click', function() {
         }
     });
 
+    // Add instructions to each sheet
+    sheet1Data.unshift(['Instruksi: Data pada Sheet ini berisi kolom Name, Age, dan Nomor Telepon.']);
+    sheet2Data.unshift(['Instruksi: Data pada Sheet ini berisi kolom Name, Position Karyawan, Office, Start date, dan Salary.']);
+
     var wb = XLSX.utils.book_new();
     var ws1 = XLSX.utils.aoa_to_sheet(sheet1Data);
     var ws2 = XLSX.utils.aoa_to_sheet(sheet2Data);
