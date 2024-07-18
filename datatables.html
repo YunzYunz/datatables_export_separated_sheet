@@ -64,7 +64,6 @@
         margin-top: 20px;
         text-align: center;
     }
-
 </style>
 </head>
 <body>
@@ -96,7 +95,7 @@
     </div>
     
     <div>
-        <input type="search" id="tableSearch" placeholder="Cari">
+        <input type="search" id="tableSearch" placeholder="Search">
     </div>
 </div>
 
@@ -147,7 +146,7 @@
 $(document).ready(function() {
     var columnsToExport = [1, 2, 3, 4, 5, 6, 7]; // Array default untuk kolom yang akan diekspor
 
-	// Customize the pagination buttons to show only active ones
+    // Customize the pagination buttons to show only active ones
     $.fn.dataTable.ext.pager.numbers_length = 3;
 	
     var table = $('#example').DataTable({
@@ -175,7 +174,6 @@ $(document).ready(function() {
             $('#custom-pagination').append($('.dataTables_paginate'));
             // Move info element to custom container
             $('#custom-info').append($('.dataTables_info'));
-			
         },
         pagingType: 'full_numbers_no_ellipses',
 		pageLength: 10, // Set tampil row
@@ -193,8 +191,6 @@ $(document).ready(function() {
 		]
     });
 	
-	
-
     // Populate nested select options dynamically
     function populateFilterOptions() {
         var filterSelect = $('#filterSelect');
@@ -289,9 +285,9 @@ $('#selectAllCheckbox').prop('checked', allChecked);
 });
 // Custom export button functionality
 $('#exportExcel').on('click', function() {
-    var sheet1Data = [['Name', 'Age', 'Nomor Telepon']];
-    var sheet2Data = [['Name', 'Position Karyawan', 'Office', 'Start date', 'Salary']];
-    
+    var sheet1Data = [['Name', 'Age', 'Nomor Telepon', '', 'Instructions: Data in this Sheet contains Name, Age, and Phone Number columns.']];
+    var sheet2Data = [['Name', 'Position Karyawan', 'Office', 'Start date', 'Salary', '', 'Instructions: Data in this Sheet contains Name, Position Karyawan, Office, Start date, and Salary columns.']];
+
     table.rows().every(function() {
         var data = this.data();
         var checkbox = $(this.node()).find('.rowCheckbox').prop('checked');
@@ -300,10 +296,6 @@ $('#exportExcel').on('click', function() {
             sheet2Data.push([data[1], data[2], data[3], data[6], data[7]]);
         }
     });
-
-    // Add instructions to each sheet
-    sheet1Data.unshift(['Instruksi: Data pada Sheet ini berisi kolom Name, Age, dan Nomor Telepon.']);
-    sheet2Data.unshift(['Instruksi: Data pada Sheet ini berisi kolom Name, Position Karyawan, Office, Start date, dan Salary.']);
 
     var wb = XLSX.utils.book_new();
     var ws1 = XLSX.utils.aoa_to_sheet(sheet1Data);
