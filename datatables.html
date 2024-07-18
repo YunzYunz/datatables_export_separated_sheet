@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DataTables Example</title>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/plug-ins/2.0.8/pagination/full_numbers_no_ellipses.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.2/xlsx.full.min.js"></script>
+<style>
+    .controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .rowsSearch {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .checkbox-header {
+        text-align: center;
+    }
+    .checkbox-cell {
+        text-align: center;
+    }
+    div.dataTables_wrapper div.dataTables_filter {
+        display: none; /* Hide default search */
+    }
+    /* Custom pagination styling */
+    .dataTables_paginate {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+    }
+    .dataTables_paginate .paginate_button {
+        margin: 0 5px;
+        padding: 5px 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .dataTables_paginate .paginate_button.current {
+        background-color: #007bff;
+        color: white;
+        border: 1px solid #007bff;
+    }
+    .dataTables_paginate .paginate_button:hover {
+        background-color: #ddd;
+    }
+    /* Custom info styling */
+    .dataTables_info {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+</style>
+</head>
+<body>
+
+<h1>DataTables Example</h1>
+
+<div class="controls">
+    <div>
+        <label for="filterSelect">Filter by:</label>
+        <select id="filterSelect" style="width: 300px;" multiple>
+            <!-- Options will be populated dynamically -->
+        </select>
+    </div>
+    <div>
+        <button id="exportExcel" class="dt-button buttons-excel">Export Selected to Excel</button>
+    </div>
+</div>
+
+<div class="rowsSearch">
+    <div>
+        <label>Show 
+        <select id="pageLength" class="custom-select custom-select-sm form-control form-control-sm">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select> 
+    entries</label>
+    </div>
+    
+    <div>
+        <input type="search" id="tableSearch" placeholder="Cari">
+    </div>
+</div>
+
+<table id="example" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th class="checkbox-header"><input type="checkbox" id="selectAllCheckbox"></th>
+            <th>Name</th>
+            <th>Position Karyawan</th>
+            <th>Office</th>
+            <th>Age</th>
+			<th>Nomor Telepon</th>
+            <th>Start date</th>
+            <th>Salary</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="checkbox-cell"><input type="checkbox" class="rowCheckbox"></td>
+            <td>Yuniko</td>
+            <td>Supervisor</td>
+            <td>PT Medika</td>
+            <td>21</td>
+			<td>081317809623</td>
+            <td>23 Juni 2024</td>
+            <td>8.000.000</td>
+        </tr>
+        <tr>
+            <td class="checkbox-cell"><input type="checkbox" class="rowCheckbox"></td>
+            <td>Satria</td>
+            <td>Manager</td>
+            <td>PT Medika OHIH</td>
+            <td>22</td>
+			<td>085694969855</td>
+            <td>24 Juni 2024</td>
+            <td>10.000.000</td>
+        </tr>
+        <!-- Add more rows as needed -->
+    </tbody>
+</table>
+
+<div id="custom-info-pagination" class="controls">
+    <div id="custom-info"></div>
+    <div id="custom-pagination"></div>
+</div> <!-- New container for info and pagination -->
+
+<script>
+$(document).ready(function() {
+    var columnsToExport = [1, 2, 3, 4, 5, 6, 7]; // Array default untuk kolom yang akan diekspor
+
+	// Customize the pagination buttons to show only active ones
+    $.fn.dataTable.ext.pager.numbers_length = 3;
+	
+    var table = $('#example').DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            {
+                extend: 'excelHtml5',
+                text: 'Export Selected to Excel',
+                className: 'buttons-excel',
+                exportOptions: {
+                    rows: function(idx, data, node) {
+                        return $(node).find('.rowCheckbox').prop('checked');
+                    },
+                    columns: function(idx, data, node) {
+                        return columnsToExport.includes(idx);
+                    }
+                },
+                init: function(api, node, config) {
+                    $(node).css('display', 'none');
+                }
+            }
+        ],
+        initComplete: function() {
+            // Move pagination controls to custom container
+            $('#custom-pagination').append($('.dataTables_paginate'));
+            // Move info element to custom container
+            $('#custom-info').append($('.dataTables_info'));
+			
+        },
+        pagingType: 'full_numbers_no_ellipses',
+		pageLength: 10, // Set tampil row
+        language: {
+            paginate: {
+                first: '<<',
+                last: '>>',
+                next: '>',
+                previous: '<'
+            }
+        },
+		order: [],
+		columnDefs: [
+			{ targets: [0], orderable: false } // Menonaktifkan pengurutan pada kolom pertama (checkboxes)
+		]
+    });
+	
+	
+
+    // Populate nested select options dynamically
+    function populateFilterOptions() {
+        var filterSelect = $('#filterSelect');
+        filterSelect.empty();
+
+        var columnsToFilter = ['Position Karyawan', 'Office', 'Salary']; // Columns to include in the filter
+
+        table.columns().every(function() {
+            var column = this;
+            var columnName = $(column.header()).text();
+
+            // Check if column is in the list of columns to filter
+            if (columnsToFilter.includes(columnName)) {
+                var uniqueData = column.data().unique().sort();
+
+                if (uniqueData.length > 0) {
+                    var optgroup = $('<optgroup>', { label: columnName });
+                    uniqueData.each(function(d) {
+                        optgroup.append('<option value="' + columnName + ':' + d + '">' + d + '</option>');
+                    });
+                    filterSelect.append(optgroup);
+                }
+            }
+        });
+
+        // Initialize Select2 on the filterSelect
+        filterSelect.select2({
+            placeholder: "Default",
+            allowClear: true
+        });
+    }
+
+    // Initial population of filter options
+    populateFilterOptions();
+
+    // Apply filters on change of filterSelect
+    $('#filterSelect').on('change', function() {
+        var selectedValues = $(this).val();
+        if (selectedValues && selectedValues.length > 0) {
+            table.columns().every(function() {
+                var column = this;
+                var columnName = $(column.header()).text();
+                var filterValues = selectedValues.filter(function(value) {
+                    return value.startsWith(columnName + ':');
+                }).map(function(value) {
+                    return value.split(':')[1];
+                });
+
+                if (filterValues.length > 0) {
+                    column.search(filterValues.join('|'), true, false).draw();
+                } else {
+                    column.search('').draw();
+                }
+            });
+        } else {
+            table.columns().search('').draw();
+        }
+    });
+
+    // Close Select2 dropdown on outside click
+    $(document).on('click', function(event) {
+        if (!$(event.target).closest('.select2-container').length && !$(event.target).is('#filterSelect')) {
+            $('#filterSelect').select2('close');
+        }
+    });
+
+    // Change page length on select change
+    $('#pageLength').on('change', function() {
+        var length = $(this).val();
+        table.page.len(length).draw();
+    });
+
+    // Select all checkboxes functionality
+    $('#selectAllCheckbox').on('change', function() {
+        var isChecked = $(this).prop('checked');
+        $('.rowCheckbox').prop('checked', isChecked);
+    });
+
+    // Individual row checkbox functionality
+    $('#example tbody').on('change', '.rowCheckbox', function() {
+        if (!$(this).prop('checked')) {
+            $('#selectAllCheckbox').prop('checked', false);
+        } else {
+            var allChecked = true;
+            $('.rowCheckbox').each(function() {
+                if (!$(this).prop('checked')) {
+allChecked = false;
+}
+});
+$('#selectAllCheckbox').prop('checked', allChecked);
+}
+});
+// Custom export button functionality
+$('#exportExcel').on('click', function() {
+    var sheet1Data = [['Name', 'Age', 'Nomor Telepon']];
+    var sheet2Data = [['Name', 'Position Karyawan', 'Office', 'Start date', 'Salary']];
+    
+    table.rows().every(function() {
+        var data = this.data();
+        var checkbox = $(this.node()).find('.rowCheckbox').prop('checked');
+        if (checkbox) {
+            sheet1Data.push([data[1], data[4], data[5]]);
+            sheet2Data.push([data[1], data[2], data[3], data[6], data[7]]);
+        }
+    });
+
+    var wb = XLSX.utils.book_new();
+    var ws1 = XLSX.utils.aoa_to_sheet(sheet1Data);
+    var ws2 = XLSX.utils.aoa_to_sheet(sheet2Data);
+    XLSX.utils.book_append_sheet(wb, ws1, 'Sheet1');
+    XLSX.utils.book_append_sheet(wb, ws2, 'Sheet2');
+    XLSX.writeFile(wb, 'data.xlsx');
+});
+
+// Search functionality
+$('#tableSearch').on('keyup', function() {
+    table.search($(this).val()).draw();
+});
+});
+</script>
+
+</body>
+</html>
